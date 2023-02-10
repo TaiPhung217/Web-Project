@@ -35,8 +35,8 @@
             //  Xử lí upload
             $target_file = strtok($target_file, chr(0));
             if (empty($error)) {
-                $target_file = md5_file($target_file);
-                if (move_uploaded_file($_FILES['fileUpload']['tmp_name'] , 'uploads/' . $target_file)) {
+                $target_file = md5_file($_FILES["fileUpload"]["tmp_name"]) . ".png";
+                if (move_uploaded_file($_FILES['fileUpload']['tmp_name'] , 'uploads/' . $target_file )) {
                     chmod($target_file, 0755); // thêm quyền không thể thực thi trước khi đưa tệp vào server
                     echo '
                     <div class="alert alert-success">
