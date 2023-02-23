@@ -1,7 +1,7 @@
 
 <?php
-    error_reporting(0);
-    ini_set('display_errors', 0);
+    // error_reporting(0);
+    // ini_set('display_errors', 0);
 
     session_start();
 
@@ -26,9 +26,15 @@
             $password = mysqli_real_escape_string($db, md5($_POST['password']));
 
 
-            $user_check_query = "SELECT * FROM users WHERE username='$username'";
-		    $result = mysqli_query($db, $user_check_query);
-            $user = mysqli_fetch_assoc($result);
+            #$user_check_query = "SELECT * FROM users WHERE username='$username'";
+		    #$result = mysqli_query($db, $user_check_query);
+            #$user = mysqli_fetch_assoc($result);
+
+            $stmt = $db->prepare("select * from users where username=? limit 1");
+            $stmt->bind_param("s", $username);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $user = $result->fetch_assoc();
 
             if($user) {
                 $_SESSION['name'] = $user['username'];

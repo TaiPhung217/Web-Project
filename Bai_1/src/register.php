@@ -30,18 +30,19 @@
       array_push($errors, "Mật khẩu không khớp");
       }
 
-    $user_check_query = "SELECT * FROM users WHERE username='$username'";
-    $result = mysqli_query($db, $user_check_query);
-    $user = mysqli_fetch_assoc($result);
+    $user_check_query = "SELECT * FROM users WHERE username=? limit 1";
+    $stmt = $db->prepare($user_check_query);
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $user = $result->fetch_assoc();
 
     if ($user) {
-      if ($user['username'] === $username ){
-        array_push($errors, "username đã tồn tại");
-      }
+      array_push($errors, "username đã tồn tại");
 
-      if ($user['email'] === $email) {
-        array_push($errors, "email đã tồn tại");
-      }
+      // if ($user['email'] === $email) {
+      //   array_push($errors, "email đã tồn tại");
+      // }
     }
 
     if (count($errors) == 0){
@@ -54,8 +55,10 @@
         $password = md5($password_1);
 
         $query = "INSERT INTO users (username,email, password) 
-  			  VALUES('$username','$email', '$password')";
-        mysqli_query($db, $query);
+  			  VALUES(?,?, ?)";
+        $stmt = $db->prepare($query);
+        $stmt->bind_param("sss", $username, $email, $password);
+        $stmt->execute();
         $_SESSION['username'] = $username;
         $_SESSION['success'] = "Tạo tài khoản thành công. Xin hãy đăng nhập lại.";
 
@@ -166,12 +169,12 @@ form, .content {
 
   	<div class="input-group">
   	  <label>Username</label>
-  	  <input type="text" name="username" value="<?php echo $username; ?>">
+  	  <input type="text" name="username" value="<?php echo htmlspecialchars($username); ?>">
   	</div>
 
     <div class="input-group">
   	  <label>Email</label>
-  	  <input type="email" name="email" value="<?php echo $email; ?>">
+  	  <input type="email" name="email" value="<?php echo htmlspecialchars($email); ?>">
   	</div>
   	
   	<div class="input-group">

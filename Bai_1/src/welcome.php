@@ -55,9 +55,14 @@
 
         include 'connect_database.php';
 
-        $user_check_query = "SELECT * FROM users WHERE username='{$_SESSION['name']}'";
-		$result = mysqli_query($db, $user_check_query);
-        $user = mysqli_fetch_assoc($result);
+        $user_check_query = "SELECT * FROM users WHERE username=? limit 1";
+		
+        $stmt = $db->prepare($user_check_query);
+        $stmt->bind_param("s",$_SESSION['name']);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $user = $result->fetch_assoc();
+
         if($user) {
             $id = $user['id'];
             $username = $user['username'];
@@ -113,16 +118,16 @@
 </head>
 <body>
     <header>
-        <h1> Welcome, <?php echo($_SESSION['name']); ?><h1>
+        <h1> Welcome, <?php echo htmlspecialchars($_SESSION['name']); ?><h1>
         <a class="btn" href="logout.php">Logout</a>
     </header>
     <section>
         <div class="container">
             <div class="infor">
                 <h2> Thông tin cá nhân </h2>
-                <div>ID: <?php echo($_SESSION['id']); ?></div>
-                <div>Username: <?php echo($_SESSION['name']); ?></div>
-                <div>Email: <?php echo($_SESSION['email']); ?></div>
+                <div>ID: <?php echo htmlspecialchars($_SESSION['id']); ?></div>
+                <div>Username: <?php echo htmlspecialchars($_SESSION['name']); ?></div>
+                <div>Email: <?php echo htmlspecialchars($_SESSION['email']); ?></div>
             </div>
         <div class="upload">
             <h2>Upload image</h2>
